@@ -1,0 +1,33 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  ANDROID_HOME: "/opt/android-sdk-linux"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  # Устанавливаем SDK и необходимые инструменты
+  - apt-get update -qq && apt-get install -y -qq wget unzip
+  - mkdir -p $ANDROID_HOME
+  - wget -q https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -O commandlinetools.zip
+  - unzip commandlinetools.zip -d $ANDROID_HOME
+  - yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;30.0.3"
+  - export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$PATH
+
+build:
+  stage: build
+  script:
+    - ./gradlew clean assembleRelease
+
+test:
+  stage: test
+  script:
+    - ./gradlew test
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    # Добавь сюда свой процесс деплоя, например, с использованием Firebase App Distribution или других инструментов
