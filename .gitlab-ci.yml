@@ -1,7 +1,6 @@
 stages:
   - build
   - test
-  - deploy
 
 # Step 1: Build the app
 build_job:
@@ -25,11 +24,3 @@ test_job:
     - gradle --version  # Проверяем версию Gradle
   script:
     - gradle test --stacktrace  # Запуск тестов с выводом стека ошибок
-
-# Step 3: Deploy (optional, можно оставить пустым или настроить по своему усмотрению)
-deploy_job:
-  stage: deploy
-  script:
-    - echo "Deploying application..."  # Это место для добавления деплоя, если нужно
-  only:
-    - main  # Запускать только на основной ветке
