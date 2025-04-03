@@ -1,45 +1,46 @@
-image: ubuntu:latest
-
 stages:
   - build
   - test
   - deploy
 
-before_script:
-  # Установка зависимостей для Ubuntu
-  - apt-get update -qq
-  - apt-get install -y wget tar openjdk-11-jdk unzip
-
-  # Установка переменной окружения для SDK
-  - export ANDROID_SDK_ROOT=/opt/android-sdk
-  - mkdir -p "$ANDROID_SDK_ROOT"
-
-  # Установка Android SDK
-  - wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
-  - unzip commandlinetools.zip -d "$ANDROID_SDK_ROOT"
-  - yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;35.0.0" "platform-tools"
-  
-  # Устанавливаем путь к SDK
-  - export PATH="$ANDROID_SDK_ROOT/cmdline-tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
-  - chmod +x gradlew
-
-cache:
-  key: "$CI_COMMIT_REF_SLUG"
-  paths:
-    - .gradle/
-    - app/build/
-
-build:
+# Строим проект
+build_job:
   stage: build
+  image: openjdk:11  # Используем контейнер с Java для сборки Android
+  before_script:
+    - apt-get update -y
+    - apt-get install -y wget unzip
+    - wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
+    - unzip commandlinetools-linux-7583922_latest.zip -d /cmdline-tools
+    - yes | /cmdline-tools/bin/sdkmanager --sdk_root=/sdk "platforms;android-30" "build-tools;30.0.3"
+    - export ANDROID_HOME=/sdk
+    - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
   script:
-    - ./gradlew clean assembleDebug
+    - ./gradlew assembleRelease  # или assembleDebug, в зависимости от твоей конфигурации
+  artifacts:
+    paths:
+      - app/build/outputs/apk/  # Путь к apk файлам после сборки
 
-test:
+# Тестируем проект
+test_job:
   stage: test
+  image: openjdk:11
+  before_script:
+    - apt-get update -y
+    - apt-get install -y wget unzip
+    - wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
+    - unzip commandlinetools-linux-7583922_latest.zip -d /cmdline-tools
+    - yes | /cmdline-tools/bin/sdkmanager --sdk_root=/sdk "platforms;android-30" "build-tools;30.0.3"
+    - export ANDROID_HOME=/sdk
+    - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
   script:
-    - ./gradlew testDebug
+    - ./gradlew test  # Здесь запускаются unit-тесты, если они есть
 
-deploy:
+# Деплой проекта
+deploy_job:
   stage: deploy
   script:
-    - echo "Deploying the app..."
+    - echo "Deploying APK..."
+    - # Здесь твоя команда деплоя, например, на Google Play или на сервер
+  only:
+    - main  # Этот шаг выполняется только на ветке main
