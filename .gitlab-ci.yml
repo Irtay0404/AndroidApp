@@ -6,25 +6,25 @@ stages:
 # Строим проект
 build_job:
   stage: build
-  image: gradle:7.4-jdk11  # Используем официальный образ Gradle с JDK 11
+  image: gradle:7.4-jdk11
   script:
-    - gradle clean assembleRelease  # Сборка релизной версии APK
+    - gradle clean assembleRelease --stacktrace --info  # Запуск с подробной информацией
   artifacts:
     paths:
-      - app/build/outputs/apk/  # Путь к сгенерированным APK файлам
-    expire_in: 1 hour  # Время хранения артефактов (apk файлов)
+      - app/build/outputs/apk/
+    expire_in: 1 hour
 
 # Тестируем проект
 test_job:
   stage: test
   image: gradle:7.4-jdk11
   script:
-    - gradle test  # Запуск юнит-тестов
+    - gradle test --stacktrace --info  # Запуск с подробной информацией
 
 # Деплой проекта
 deploy_job:
   stage: deploy
   script:
-    - echo "Deploying APK..."  # Здесь добавь команды для деплоя (например, отправка APK на сервер)
+    - echo "Deploying APK..."
   only:
-    - main  # Выполняем деплой только для основной ветки
+    - main
