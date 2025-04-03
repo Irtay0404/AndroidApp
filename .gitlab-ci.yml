@@ -5,11 +5,12 @@ stages:
 # Сборка проекта
 build_job:
   stage: build
-  image: gradle:7.4-jdk11  # Используем образ с Gradle и JDK 11
+  image: gradle:7.4-jdk11  # Образ с Gradle и JDK 11
   before_script:
-    - gradle --version  # Проверка версии Gradle
+    - gradle wrapper --gradle-version 7.4  # Обновляем wrapper до нужной версии
+    - ./gradlew --version  # Проверка версии Gradle, которая будет использоваться
   script:
-    - gradle clean build  # Чистим и строим проект
+    - ./gradlew clean build  # Используем gradlew, чтобы гарантировать использование версии, заданной в проекте
   artifacts:
     paths:
       - app/build/outputs  # Сохраняем результаты сборки (APK или AAB)
@@ -19,6 +20,7 @@ test_job:
   stage: test
   image: gradle:7.4-jdk11  # Снова используем тот же образ
   before_script:
-    - gradle --version  # Проверка версии Gradle
+    - gradle wrapper --gradle-version 7.4  # Обновляем wrapper до нужной версии
+    - ./gradlew --version  # Проверка версии Gradle, которая будет использоваться
   script:
-    - gradle test  # Запуск юнит-тестов
+    - ./gradlew test  # Запуск юнит-тестов
