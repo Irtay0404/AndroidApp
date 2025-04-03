@@ -1,34 +1,37 @@
 stages:
   - build
   - test
+  - deploy
 
 variables:
-  ANDROID_SDK_ROOT: "$HOME/android-sdk"
-  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  ANDROID_HOME: "/opt/android-sdk-linux"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 before_script:
-  # Установка Android SDK, если его нет
-  - if [ ! -d "$ANDROID_SDK_ROOT" ]; then
-      mkdir -p "$ANDROID_SDK_ROOT";
-      wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip;
-      unzip commandlinetools.zip -d "$ANDROID_SDK_ROOT";
-      yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;35.0.0" "platform-tools";
-    fi
-  - export PATH="$ANDROID_SDK_ROOT/cmdline-tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
-  - chmod +x gradlew
-
-cache:
-  key: "$CI_COMMIT_REF_SLUG"
-  paths:
-    - .gradle/
-    - app/build/
+  # Устанавливаем SDK и необходимые инструменты
+  - apt-get update -qq && apt-get install -y -qq wget unzip openjdk-11-jdk
+  - mkdir -p $ANDROID_HOME
+  - wget -q https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -O commandlinetools.zip
+  - unzip commandlinetools.zip -d $ANDROID_HOME
+  - yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;30.0.3"
+  - export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$PATH
+  - wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip
+  - unzip gradle-7.4.2-bin.zip
+  - export PATH=$PATH:$CI_PROJECT_DIR/gradle-7.4.2/bin
 
 build:
   stage: build
   script:
-    - ./gradlew clean assembleDebug
+    - ./gradlew clean assembleRelease --stacktrace
 
 test:
   stage: test
   script:
-    - ./gradlew testDebug
+    - ./gradlew test --stacktrace
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
+    # Тут ты можешь добавить процесс деплоя, если нужно.
