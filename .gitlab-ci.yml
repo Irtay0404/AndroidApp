@@ -8,7 +8,7 @@ stages:
 before_script:
   # Установка зависимостей для Ubuntu
   - apt-get update -qq
-  - apt-get install -y wget tar openjdk-11-jdk
+  - apt-get install -y wget tar openjdk-11-jdk unzip
 
   # Установка переменной окружения для SDK
   - export ANDROID_SDK_ROOT=/opt/android-sdk
