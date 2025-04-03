@@ -3,28 +3,22 @@ stages:
   - test
   - deploy
 
-# Строим проект
+# Очистка кэша и сборка
 build_job:
   stage: build
   image: gradle:7.4-jdk11
+  before_script:
+    - gradle clean
   script:
-    - gradle clean assembleRelease --stacktrace --info  # Запуск с подробной информацией
+    - gradle assembleRelease --stacktrace --info
   artifacts:
     paths:
       - app/build/outputs/apk/
     expire_in: 1 hour
 
-# Тестируем проект
+# Тестирование
 test_job:
   stage: test
   image: gradle:7.4-jdk11
   script:
-    - gradle test --stacktrace --info  # Запуск с подробной информацией
-
-# Деплой проекта
-deploy_job:
-  stage: deploy
-  script:
-    - echo "Deploying APK..."
-  only:
-    - main
+    - gradle test --stacktrace --info
