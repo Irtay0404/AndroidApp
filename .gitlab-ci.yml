@@ -1,15 +1,12 @@
+image: openjdk:11
+
 stages:
   - build
   - test
   - deploy
 
 before_script:
-  # Устанавливаем Java
-  - apt-get update -qq && apt-get install -y openjdk-11-jdk
-  - export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
-  - export PATH=$JAVA_HOME/bin:$PATH
-
-# Установка Android SDK
+  # Устанавливаем Android SDK
   - if [ ! -d "$ANDROID_SDK_ROOT" ]; then
       mkdir -p "$ANDROID_SDK_ROOT";
       wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip;
