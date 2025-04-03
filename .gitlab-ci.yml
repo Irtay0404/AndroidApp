@@ -2,25 +2,23 @@ stages:
   - build
   - test
 
-# Step 1: Build the app
+# Сборка проекта
 build_job:
   stage: build
-  image: gradle:7.4-jdk11  # Используем официальный Gradle Docker образ с JDK 11
+  image: gradle:7.4-jdk11  # Используем образ с Gradle и JDK 11
   before_script:
-    - echo "Setting up Gradle"
-    - gradle --version  # Проверяем версию Gradle
+    - gradle --version  # Проверка версии Gradle
   script:
-    - gradle clean build --stacktrace  # Сборка проекта с выводом стека ошибок
+    - gradle clean build  # Чистим и строим проект
   artifacts:
     paths:
-      - app/build/outputs  # Сохраняем артефакты сборки (apk файлы) для использования в следующих шагах
+      - app/build/outputs  # Сохраняем результаты сборки (APK или AAB)
 
-# Step 2: Run unit tests
+# Тестирование
 test_job:
   stage: test
-  image: gradle:7.4-jdk11
+  image: gradle:7.4-jdk11  # Снова используем тот же образ
   before_script:
-    - echo "Running tests"
-    - gradle --version  # Проверяем версию Gradle
+    - gradle --version  # Проверка версии Gradle
   script:
-    - gradle test --stacktrace  # Запуск тестов с выводом стека ошибок
+    - gradle test  # Запуск юнит-тестов
