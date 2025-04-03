@@ -10,7 +10,7 @@ build_job:
   before_script:
     - gradle clean
   script:
-    - gradle assembleRelease --stacktrace --info
+    - gradle assembleRelease --info --stacktrace
   artifacts:
     paths:
       - app/build/outputs/apk/
@@ -21,4 +21,4 @@ test_job:
   stage: test
   image: gradle:7.4-jdk11
   script:
-    - gradle test --stacktrace --info
+    - gradle test --info --stacktrace
