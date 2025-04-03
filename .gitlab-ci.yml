@@ -1,14 +1,14 @@
+image: ubuntu:latest
+
 stages:
   - build
   - test
   - deploy
 
 before_script:
-  # Установка JDK вручную
-  - wget -q https://download.java.net/java/early_access/jdk11/33/GPL/openjdk-11_linux-x64_bin.tar.gz
-  - tar -xzf openjdk-11_linux-x64_bin.tar.gz
-  - export JAVA_HOME=$(pwd)/jdk-11
-  - export PATH=$JAVA_HOME/bin:$PATH
+  # Установка зависимостей для Ubuntu
+  - apt-get update -qq
+  - apt-get install -y wget tar openjdk-11-jdk
 
   # Установка Android SDK
   - if [ ! -d "$ANDROID_SDK_ROOT" ]; then
