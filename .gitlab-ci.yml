@@ -1,10 +1,35 @@
 stages:
   - build
+  - test
+  - deploy
 
+# Step 1: Build the app
 build_job:
   stage: build
+  image: gradle:7.4-jdk11  # Используем официальный Gradle Docker образ с JDK 11
+  before_script:
+    - echo "Setting up Gradle"
+    - gradle --version  # Проверяем версию Gradle
+  script:
+    - gradle clean build --stacktrace  # Сборка проекта с выводом стека ошибок
+  artifacts:
+    paths:
+      - app/build/outputs  # Сохраняем артефакты сборки (apk файлы) для использования в следующих шагах
+
+# Step 2: Run unit tests
+test_job:
+  stage: test
   image: gradle:7.4-jdk11
   before_script:
-    - gradle clean
+    - echo "Running tests"
+    - gradle --version  # Проверяем версию Gradle
   script:
-    - gradle assembleRelease --stacktrace
+    - gradle test --stacktrace  # Запуск тестов с выводом стека ошибок
+
+# Step 3: Deploy (optional, можно оставить пустым или настроить по своему усмотрению)
+deploy_job:
+  stage: deploy
+  script:
+    - echo "Deploying application..."  # Это место для добавления деплоя, если нужно
+  only:
+    - main  # Запускать только на основной ветке
