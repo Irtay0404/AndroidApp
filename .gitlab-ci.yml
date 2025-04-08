@@ -1,26 +1,33 @@
 stages:
-  - build
   - test
+  - build
 
-# Сборка проекта
-build_job:
-  stage: build
-  image: gradle:7.4-jdk11  # Образ с Gradle и JDK 11
-  before_script:
-    - gradle wrapper --gradle-version 7.4  # Обновляем wrapper до нужной версии
-    - ./gradlew --version  # Проверка версии Gradle, которая будет использоваться
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  key: gradle-cache
+  paths:
+    - .gradle/wrapper/
+    - .gradle/caches/
+
+test:
+  stage: test
+  image: gradle:8.0-jdk17
   script:
-    - ./gradlew clean build  # Используем gradlew, чтобы гарантировать использование версии, заданной в проекте
+    - chmod +x gradlew
+    - ./gradlew test
+  only:
+    - main
+
+build:
+  stage: build
+  image: gradle:8.0-jdk17
+  script:
+    - chmod +x gradlew
+    - ./gradlew assembleDebug
   artifacts:
     paths:
-      - app/build/outputs  # Сохраняем результаты сборки (APK или AAB)
-
-# Тестирование
-test_job:
-  stage: test
-  image: gradle:7.4-jdk11  # Снова используем тот же образ
-  before_script:
-    - gradle wrapper --gradle-version 7.4  # Обновляем wrapper до нужной версии
-    - ./gradlew --version  # Проверка версии Gradle, которая будет использоваться
-  script:
-    - ./gradlew test  # Запуск юнит-тестов
+      - app/build/outputs/apk/debug/app-debug.apk
+  only:
+    - main
